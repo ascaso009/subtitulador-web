@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+mis_videos/
+models/
+.streamlit/
+.DS_Store
+Thumbs.db

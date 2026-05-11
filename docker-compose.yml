@@ -1,0 +1,14 @@
+# version: '3'
+services:
+  subtitulador:
+    build: .
+    image: subtitulador-web
+    ports:
+      - "8501:8501"
+    volumes:
+      - translation_models:/models
+      - ./mis_videos:/data
+    command: []   # vacío para interfaz web
+
+volumes:
+  translation_models:
