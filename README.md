@@ -32,9 +32,82 @@ Herramienta web para **transcribir, traducir e incrustar subtítulos** en vídeo
 
 ---
 
-## 🚀 Instalación rápida (2 comandos)
+## 🌐 Demo en vivo
+
+¿No quieres instalar nada? Pruébalo gratis aquí:  
+👉 [https://subtitulador-web.onrender.com](https://subtitulador-web.onrender.com)
+
+*(Puede tardar unos segundos en despertar si no se ha usado recientemente)*
+
+---
+
+## 🚀 Instalación rápida
 
 ```bash
 git clone https://github.com/ascaso009/subtitulador-web.git
 cd subtitulador-web
 docker compose up
+
+Abre `http://localhost:8501` y sigue los 3 pasos en pantalla.
+
+### O con Docker directamente
+
+`docker run -p 8501:8501 -v ./mis_videos:/data ascaso99/subtitulador-web:latest`
+
+---
+
+## 📁 Montar tus archivos
+
+Crea una carpeta `mis_videos` junto al proyecto y pon tus vídeos ahí. Dentro del contenedor estarán en `/data/`. También puedes **subirlos directamente** desde la interfaz web.
+
+`mkdir mis_videos`
+`cp /ruta/a/tu_video.mp4 mis_videos/`
+
+En la web, selecciona "Ruta en /data" y escribe `/data/tu_video.mp4`.
+
+---
+
+## 🛠 Requisitos
+
+- **Docker** y **Docker Compose**
+- **Conexión a internet** solo la primera vez (descarga modelos de IA)
+- Después: **100% offline**, incluso la traducción
+
+---
+
+## 📸 Captura de pantalla
+
+![Interfaz del subtitulador](screenshot.png)
+
+---
+
+## 📦 Docker Hub
+
+Imagen precompilada disponible en:  
+👉 [**ascaso99/subtitulador-web**](https://hub.docker.com/r/ascaso99/subtitulador-web)
+
+`docker pull ascaso99/subtitulador-web:latest`
+
+---
+
+## 🧑‍💻 Desarrollo
+
+`git clone https://github.com/ascaso009/subtitulador-web.git`
+`cd subtitulador-web`
+`docker compose up --build`
+
+Los modelos de Whisper y traducción se descargan automáticamente la primera vez.
+
+---
+
+## 🤝 Contribuir
+
+¿Quieres ayudar a mejorar el proyecto? Revisa la [guía de contribución](CONTRIBUTING.md).
+
+---
+
+## 📝 Licencia
+
+MIT - Libre para usar, modificar y compartir.
+
+Hecho con ❤️ por [@ascaso009](https://github.com/ascaso009)
