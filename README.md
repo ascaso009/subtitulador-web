@@ -77,7 +77,8 @@ En la web, selecciona "Ruta en /data" y escribe `/data/tu_video.mp4`.
 
 ## 📸 Captura de pantalla
 
-![screenshot](screenshot.png)
+![screenshot](captura.png)
+
 ---
 
 ## 📦 Docker Hub
