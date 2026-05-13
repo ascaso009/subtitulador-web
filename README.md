@@ -79,6 +79,7 @@ En la web, selecciona "Ruta en /data" y escribe `/data/tu_video.mp4`.
 
 ![Interfaz del subtitulador](screenshot.png)
 
+
 ---
 
 ## 📦 Docker Hub
