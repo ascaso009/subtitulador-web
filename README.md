@@ -77,8 +77,7 @@ En la web, selecciona "Ruta en /data" y escribe `/data/tu_video.mp4`.
 
 ## 📸 Captura de pantalla
 
-![Interfaz del subtitulador](https://raw.githubusercontent.com/ascaso009/subtitulador-web/main/screenshot.png)
-
+![screenshot](screenshot.png)
 ---
 
 ## 📦 Docker Hub
