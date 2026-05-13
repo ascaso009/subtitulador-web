@@ -52,6 +52,8 @@ T = {
         "position": "Posición vertical",
         "outline": "Contorno",
         "shadow": "Sombra",
+        "karaoke": "🎤 Modo Karaoke",
+        "karaoke_help": "Resalta cada palabra sincronizada con el audio",
         "process_btn": "🚀 ¡PROCESAR TODO!",
         "select_vid_first": "Selecciona un vídeo primero.",
         "transcribing": "⏳ Analizando audio...",
@@ -119,6 +121,8 @@ T = {
         "position": "Vertical position",
         "outline": "Outline",
         "shadow": "Shadow",
+        "karaoke": "🎤 Karaoke Mode",
+        "karaoke_help": "Highlight each word synced with audio",
         "process_btn": "🚀 PROCESS ALL!",
         "select_vid_first": "Select a video first.",
         "transcribing": "⏳ Analyzing audio...",
@@ -186,6 +190,8 @@ T = {
         "position": "Posición vertical",
         "outline": "Contorno",
         "shadow": "Sombra",
+        "karaoke": "🎤 Modo Karaoke",
+        "karaoke_help": "Resalta cada palabra sincronizada co audio",
         "process_btn": "🚀 PROCESAR TODO!",
         "select_vid_first": "Selecciona un vídeo primeiro.",
         "transcribing": "⏳ Analizando audio...",
@@ -253,6 +259,8 @@ T = {
         "position": "Position verticale",
         "outline": "Contour",
         "shadow": "Ombre",
+        "karaoke": "🎤 Mode Karaoké",
+        "karaoke_help": "Surligne chaque mot synchronisé avec l'audio",
         "process_btn": "🚀 TOUT TRAITER !",
         "select_vid_first": "Sélectionnez d'abord une vidéo.",
         "transcribing": "⏳ Analyse de l'audio...",
@@ -326,6 +334,10 @@ for key, val in DEFAULT_STYLE.items():
     if key not in st.session_state:
         st.session_state[key] = val
 
+# Karaoke por defecto
+if "karaoke" not in st.session_state:
+    st.session_state.karaoke = True
+
 # ---------- Mapeo de códigos de idioma a nombres ----------
 LANG_CODES = {
     "Auto": "auto",
@@ -364,7 +376,7 @@ def obtener_duracion(video_path):
     except:
         return None
 
-def transcribir_con_progreso(media_file, srt_out, model, language):
+def transcribir_con_progreso(media_file, srt_out, model, language, karaoke=False):
     duracion = obtener_duracion(media_file)
     barra = st.progress(0)
     estado = st.empty()
@@ -372,7 +384,10 @@ def transcribir_con_progreso(media_file, srt_out, model, language):
 
     lang_arg = ["--language", language] if language != "auto" else []
     cmd = ["python3", "app/subtools.py", "transcribe", media_file,
-           "-o", srt_out, "--model", model] + lang_arg
+           "-o", srt_out, "--model", model]
+    if karaoke:
+        cmd.append("--karaoke")
+    cmd += lang_arg
 
     proceso = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
@@ -395,7 +410,6 @@ def transcribir_con_progreso(media_file, srt_out, model, language):
     return proceso.returncode, proceso.stderr.read()
 
 def quemar_subtitulos_simple(video_in, srt_in, estilo, video_out):
-    """Quema subtítulos SIN barra de progreso, mucho más fiable."""
     estado = st.empty()
     estado.text(L["burning"])
 
@@ -505,12 +519,14 @@ with c_out:
 with c_sha:
     st.session_state.shadow = st.slider(L["shadow"], 0, 5, st.session_state.shadow)
 
+# Checkbox karaoke (por defecto activado)
+st.session_state.karaoke = st.checkbox(L["karaoke"], value=st.session_state.karaoke, help=L["karaoke_help"])
+
 st.markdown("---")
 if st.button(L["process_btn"], type="primary", use_container_width=True, disabled=not ruta_video):
     if not ruta_video:
         st.error(L["select_vid_first"])
     else:
-        # Inicializar variables por si no se definieron
         if 'traducir_despues' not in dir() and 'traducir_despues' not in locals():
             traducir_despues = False
         if 'to_lang' not in dir() and 'to_lang' not in locals():
@@ -520,7 +536,7 @@ if st.button(L["process_btn"], type="primary", use_container_width=True, disable
 
         if origen_srt == L["srt_generate"]:
             srt_out = tempfile.NamedTemporaryFile(delete=False, suffix=".srt").name
-            returncode, stderr = transcribir_con_progreso(ruta_video, srt_out, precision, idioma)
+            returncode, stderr = transcribir_con_progreso(ruta_video, srt_out, precision, idioma, st.session_state.karaoke)
             if returncode != 0:
                 st.error(f"{L['error_transcribe']}{stderr}")
                 st.stop()
@@ -545,6 +561,13 @@ if st.button(L["process_btn"], type="primary", use_container_width=True, disable
                 st.success(f"{L['translated']}{to_lang_nombre}")
 
         if ruta_srt:
+            # Usar archivo karaoke si está activo
+            srt_para_quemar = ruta_srt
+            if st.session_state.karaoke:
+                karaoke_path = ruta_srt.replace(".srt", "_karaoke.ass")
+                if os.path.exists(karaoke_path):
+                    srt_para_quemar = karaoke_path
+
             hex_color = st.session_state.font_color.lstrip('#')
             r, g, b = hex_color[0:2], hex_color[2:4], hex_color[4:6]
             ass_color = f"&H{b}{g}{r}&"
@@ -559,7 +582,7 @@ if st.button(L["process_btn"], type="primary", use_container_width=True, disable
             if not ruta_video or not os.path.exists(ruta_video):
                 st.error(L["video_lost"])
             else:
-                returncode = quemar_subtitulos_simple(ruta_video, ruta_srt, estilo, video_out)
+                returncode = quemar_subtitulos_simple(ruta_video, srt_para_quemar, estilo, video_out)
                 if returncode != 0:
                     st.error(L["error_burn"])
                 else:
